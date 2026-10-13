@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Staff - {{ CLINIC_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Staff</h1>
+  <a href="{% url 'accounts:staff_create' %}" class="btn btn-primary">Add staff member</a>
+</div>
+<div class="card shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Email</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for member in staff %}
+    <tr>
+      <td>{{ member }}</td><td>{{ member.username }}</td><td>{{ member.get_role_display }}</td><td>{{ member.email }}</td>
+      <td>{% if member.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+      <td class="text-end">
+        {% if member != user %}
+        <form method="post" action="{% url 'accounts:staff_toggle' member.pk %}" class="d-inline">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-outline-secondary" type="submit">{% if member.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

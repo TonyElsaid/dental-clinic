@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} - {{ CLINIC_NAME }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header"><h1 class="h5 mb-0">{{ page_title }}</h1></div>
+      <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="row">
+          {% for field in form %}
+            <div class="{% if field.name == 'medical_history' or field.name == 'allergies' or field.name == 'address' or field.name == 'notes' or field.name == 'description' %}col-12{% else %}col-md-6{% endif %} mb-3">
+              {% if field.widget_type == 'checkbox' %}
+                <div class="form-check">
+                  {{ field }}
+                  <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                </div>
+              {% else %}
+                <label class="form-label" for="{{ field.id_for_label }}">
+                  {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+                </label>
+                {{ field }}
+              {% endif %}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+          {% if cancel_url %}<a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancel</a>{% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
