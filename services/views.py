@@ -1,5 +1,6 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from accounts import roles
@@ -29,8 +30,8 @@ class ServiceCreateView(RoleRequiredMixin, PageContextMixin, SuccessMessageMixin
     form_class = ServiceForm
     template_name = "form_page.html"
     success_url = reverse_lazy("services:list")
-    success_message = "Service created."
-    page_title = "Add service"
+    success_message = _("Service created.")
+    page_title = _("Add service")
     cancel_url = reverse_lazy("services:list")
 
 
@@ -40,8 +41,8 @@ class ServiceUpdateView(RoleRequiredMixin, PageContextMixin, SuccessMessageMixin
     form_class = ServiceForm
     template_name = "form_page.html"
     success_url = reverse_lazy("services:list")
-    success_message = "Service updated."
-    page_title = "Edit service"
+    success_message = _("Service updated.")
+    page_title = _("Edit service")
     cancel_url = reverse_lazy("services:list")
 
 
@@ -52,6 +53,6 @@ class ServiceDeleteView(
     model = Service
     template_name = "confirm_delete.html"
     success_url = reverse_lazy("services:list")
-    success_message = "Service deleted."
-    page_title = "Delete service"
+    success_message = _("Service deleted.")
+    page_title = _("Delete service")
     cancel_url = reverse_lazy("services:list")

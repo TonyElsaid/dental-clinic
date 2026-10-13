@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import ProtectedError
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 
 
 class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -16,7 +17,7 @@ class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            messages.error(self.request, "You do not have permission to access that page.")
+            messages.error(self.request, _("You do not have permission to access that page."))
             return redirect("dashboard:home")
         return super().handle_no_permission()
 
@@ -41,7 +42,7 @@ class PageContextMixin:
     """Provide title / submit label / cancel link to the shared form templates."""
 
     page_title = ""
-    submit_label = "Save"
+    submit_label = _("Save")
     cancel_url = None
 
     def get_cancel_url(self):
@@ -66,8 +67,8 @@ class SafeDeleteMixin:
         except ProtectedError:
             messages.error(
                 self.request,
-                "This record is referenced by other records (e.g. appointments or "
-                "invoices) and cannot be deleted.",
+                _("This record is referenced by other records (e.g. appointments or "
+                  "invoices) and cannot be deleted."),
             )
             return redirect(self.get_cancel_url())
 

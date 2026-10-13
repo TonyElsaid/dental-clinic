@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -123,8 +124,8 @@ class AppointmentCreateView(
     model = Appointment
     form_class = AppointmentForm
     template_name = "form_page.html"
-    success_message = "Appointment booked."
-    page_title = "Book appointment"
+    success_message = gettext_lazy("Appointment booked.")
+    page_title = gettext_lazy("Book appointment")
     cancel_url = reverse_lazy("appointments:list")
 
     def get_initial(self):
@@ -148,8 +149,8 @@ class AppointmentUpdateView(
     model = Appointment
     form_class = AppointmentForm
     template_name = "form_page.html"
-    success_message = "Appointment updated."
-    page_title = "Edit appointment"
+    success_message = gettext_lazy("Appointment updated.")
+    page_title = gettext_lazy("Edit appointment")
 
     def get_cancel_url(self):
         return self.object.get_absolute_url()
@@ -170,7 +171,7 @@ class AppointmentStatusView(RoleRequiredMixin, View):
         new_status = request.POST.get("status")
         permitted = Appointment.Status.values if request.user.is_front_desk else self.dentist_statuses
         if new_status not in Appointment.Status.values or new_status not in permitted:
-            messages.error(request, "You cannot set that status.")
+            messages.error(request, _("You cannot set that status."))
             return redirect(appointment)
         appointment.status = new_status
         try:
@@ -178,7 +179,11 @@ class AppointmentStatusView(RoleRequiredMixin, View):
         except ValidationError as exc:
             messages.error(request, " ".join(exc.messages))
         else:
-            messages.success(request, f"Appointment marked as {appointment.get_status_display().lower()}.")
+            messages.success(
+                request,
+                _("Appointment marked as %(status)s.")
+                % {"status": appointment.get_status_display().lower()},
+            )
         return redirect(appointment)
 
 
@@ -189,8 +194,8 @@ class AppointmentDeleteView(
     model = Appointment
     template_name = "confirm_delete.html"
     success_url = reverse_lazy("appointments:list")
-    success_message = "Appointment deleted."
-    page_title = "Delete appointment"
+    success_message = gettext_lazy("Appointment deleted.")
+    page_title = gettext_lazy("Delete appointment")
 
     def get_cancel_url(self):
         return self.object.get_absolute_url()

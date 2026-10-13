@@ -5,10 +5,11 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 phone_validator = RegexValidator(
     regex=r"^\+?[0-9 ()\-]{7,20}$",
-    message="Enter a valid phone number (digits, spaces, +, -, parentheses).",
+    message=_("Enter a valid phone number (digits, spaces, +, -, parentheses)."),
 )
 
 
@@ -43,9 +44,9 @@ class PatientQuerySet(models.QuerySet):
 
 class Patient(models.Model):
     class Gender(models.TextChoices):
-        FEMALE = "F", "Female"
-        MALE = "M", "Male"
-        OTHER = "O", "Other / prefer not to say"
+        FEMALE = "F", _("Female")
+        MALE = "M", _("Male")
+        OTHER = "O", _("Other / prefer not to say")
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -58,8 +59,8 @@ class Patient(models.Model):
     emergency_contact_phone = models.CharField(
         max_length=20, blank=True, validators=[phone_validator]
     )
-    medical_history = models.TextField(blank=True, help_text="Conditions, medications, past surgeries...")
-    allergies = models.TextField(blank=True, help_text="Leave blank if none known.")
+    medical_history = models.TextField(blank=True, help_text=_("Conditions, medications, past surgeries..."))
+    allergies = models.TextField(blank=True, help_text=_("Leave blank if none known."))
 
     # Optional link to a login account for the patient portal.
     user = models.OneToOneField(

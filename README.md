@@ -138,6 +138,20 @@ Browsable API: http://127.0.0.1:8000/api/
 python manage.py test
 ```
 
+## Translations
+
+The interface is available in English and Arabic. Use the language selector in
+the navigation bar to switch languages; Arabic pages use a right-to-left layout.
+Translation strings are maintained in `locale/ar/LC_MESSAGES/django.po`.
+
+After editing translations, regenerate and compile the Arabic catalog with GNU
+gettext installed:
+
+```bash
+python manage.py makemessages -l ar
+python manage.py compilemessages
+```
+
 ## Project layout
 
 ```

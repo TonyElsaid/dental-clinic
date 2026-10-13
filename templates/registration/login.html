@@ -1,26 +1,27 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Log in - {{ CLINIC_NAME }}{% endblock %}
 {% block content %}
 <div class="row justify-content-center mt-5">
   <div class="col-md-5 col-lg-4">
     <div class="card shadow-sm">
       <div class="card-body p-4">
-        <h1 class="h4 text-center mb-4">Sign in</h1>
+        <h1 class="h4 text-center mb-4">{% trans "Sign in" %}</h1>
         <form method="post" class="needs-validation" novalidate>
           {% csrf_token %}
           {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
           <div class="mb-3">
-            <label class="form-label" for="id_username">Username</label>
+            <label class="form-label" for="id_username">{% trans "Username" %}</label>
             <input type="text" name="username" id="id_username" class="form-control" autofocus required autocomplete="username">
-            <div class="invalid-feedback">Please enter your username.</div>
+            <div class="invalid-feedback">{% trans "Please enter your username." %}</div>
           </div>
           <div class="mb-3">
-            <label class="form-label" for="id_password">Password</label>
+            <label class="form-label" for="id_password">{% trans "Password" %}</label>
             <input type="password" name="password" id="id_password" class="form-control" required autocomplete="current-password">
-            <div class="invalid-feedback">Please enter your password.</div>
+            <div class="invalid-feedback">{% trans "Please enter your password." %}</div>
           </div>
           <input type="hidden" name="next" value="{{ next }}">
-          <button class="btn btn-primary w-100" type="submit">Log in</button>
+          <button class="btn btn-primary w-100" type="submit">{% trans "Log in" %}</button>
         </form>
       </div>
     </div>

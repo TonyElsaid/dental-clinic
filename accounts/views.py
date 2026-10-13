@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, ListView
 
@@ -25,8 +26,8 @@ class StaffCreateView(RoleRequiredMixin, PageContextMixin, SuccessMessageMixin, 
     form_class = StaffCreateForm
     template_name = "form_page.html"
     success_url = reverse_lazy("accounts:staff_list")
-    success_message = "Staff account created."
-    page_title = "Add staff member"
+    success_message = _("Staff account created.")
+    page_title = _("Add staff member")
     cancel_url = reverse_lazy("accounts:staff_list")
 
 
@@ -38,10 +39,13 @@ class StaffToggleActiveView(RoleRequiredMixin, View):
     def post(self, request, pk):
         user = get_object_or_404(User.objects.exclude(role=roles.PATIENT), pk=pk)
         if user == request.user:
-            messages.error(request, "You cannot deactivate your own account.")
+            messages.error(request, _("You cannot deactivate your own account."))
         else:
             user.is_active = not user.is_active
             user.save(update_fields=["is_active"])
-            state = "activated" if user.is_active else "deactivated"
-            messages.success(request, f"{user} has been {state}.")
+            message = _("%(user)s has been %(state)s.") % {
+                "user": user,
+                "state": _("activated") if user.is_active else _("deactivated"),
+            }
+            messages.success(request, message)
         return redirect("accounts:staff_list")

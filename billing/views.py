@@ -5,6 +5,7 @@ from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
 
@@ -71,15 +72,15 @@ class InvoiceCreateView(RoleRequiredMixin, View):
     def post(self, request, appointment_pk):
         appointment = get_object_or_404(Appointment.objects.select_related("service"), pk=appointment_pk)
         if appointment.status != Appointment.Status.COMPLETED:
-            messages.error(request, "Invoices can only be generated for completed appointments.")
+            messages.error(request, _("Invoices can only be generated for completed appointments."))
             return redirect(appointment)
         invoice, created = Invoice.objects.get_or_create(
             appointment=appointment, defaults={"amount": appointment.service.price}
         )
         if created:
-            messages.success(request, f"Invoice {invoice.invoice_number} generated.")
+            messages.success(request, _("Invoice %(number)s generated.") % {"number": invoice.invoice_number})
         else:
-            messages.info(request, "An invoice already exists for this appointment.")
+            messages.info(request, _("An invoice already exists for this appointment."))
         return redirect(invoice)
 
 
@@ -87,7 +88,7 @@ class PaymentCreateView(RoleRequiredMixin, PageContextMixin, CreateView):
     allowed_roles = roles.FRONT_DESK
     form_class = PaymentForm
     template_name = "form_page.html"
-    submit_label = "Record payment"
+    submit_label = gettext_lazy("Record payment")
 
     def dispatch(self, request, *args, **kwargs):
         self.invoice = get_object_or_404(Invoice, pk=kwargs["pk"])
@@ -95,7 +96,7 @@ class PaymentCreateView(RoleRequiredMixin, PageContextMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         if self.invoice.status == Invoice.Status.PAID:
-            messages.info(request, "This invoice is already fully paid.")
+            messages.info(request, _("This invoice is already fully paid."))
             return redirect(self.invoice)
         return super().get(request, *args, **kwargs)
 
@@ -106,7 +107,10 @@ class PaymentCreateView(RoleRequiredMixin, PageContextMixin, CreateView):
 
     @property
     def page_title(self):
-        return f"Record payment for {self.invoice.invoice_number} (balance ${self.invoice.balance})"
+        return _("Record payment for %(number)s (balance $%(balance)s)") % {
+            "number": self.invoice.invoice_number,
+            "balance": self.invoice.balance,
+        }
 
     def get_cancel_url(self):
         return self.invoice.get_absolute_url()
@@ -114,7 +118,7 @@ class PaymentCreateView(RoleRequiredMixin, PageContextMixin, CreateView):
     def form_valid(self, form):
         form.instance.invoice = self.invoice
         response = super().form_valid(form)
-        messages.success(self.request, "Payment recorded.")
+        messages.success(self.request, _("Payment recorded."))
         return response
 
     def get_success_url(self):

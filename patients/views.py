@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
 
 from accounts import roles
@@ -63,8 +64,8 @@ class PatientCreateView(RoleRequiredMixin, PageContextMixin, SuccessMessageMixin
     model = Patient
     form_class = PatientForm
     template_name = "form_page.html"
-    success_message = "Patient registered."
-    page_title = "Register patient"
+    success_message = _("Patient registered.")
+    page_title = _("Register patient")
     cancel_url = reverse_lazy("patients:list")
 
 
@@ -73,8 +74,8 @@ class PatientUpdateView(RoleRequiredMixin, PageContextMixin, SuccessMessageMixin
     model = Patient
     form_class = PatientForm
     template_name = "form_page.html"
-    success_message = "Patient updated."
-    page_title = "Edit patient"
+    success_message = _("Patient updated.")
+    page_title = _("Edit patient")
 
     def get_cancel_url(self):
         return self.object.get_absolute_url()
@@ -87,8 +88,8 @@ class PatientDeleteView(
     model = Patient
     template_name = "confirm_delete.html"
     success_url = reverse_lazy("patients:list")
-    success_message = "Patient deleted."
-    page_title = "Delete patient"
+    success_message = _("Patient deleted.")
+    page_title = _("Delete patient")
 
     def get_cancel_url(self):
         return reverse("patients:detail", args=[self.object.pk])
@@ -100,8 +101,8 @@ class PortalAccountCreateView(RoleRequiredMixin, PageContextMixin, FormView):
     allowed_roles = roles.FRONT_DESK
     form_class = PortalAccountForm
     template_name = "form_page.html"
-    submit_label = "Create account"
-    page_title = "Create patient portal account"
+    submit_label = _("Create account")
+    page_title = _("Create patient portal account")
 
     def dispatch(self, request, *args, **kwargs):
         self.patient = get_object_or_404(Patient, pk=kwargs["pk"])
@@ -109,7 +110,7 @@ class PortalAccountCreateView(RoleRequiredMixin, PageContextMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if self.patient.user_id:
-            messages.info(request, "This patient already has a portal account.")
+            messages.info(request, _("This patient already has a portal account."))
             return redirect(self.patient)
         return super().get(request, *args, **kwargs)
 
@@ -123,8 +124,8 @@ class PortalAccountCreateView(RoleRequiredMixin, PageContextMixin, FormView):
 
     def form_valid(self, form):
         if self.patient.user_id:
-            messages.error(self.request, "This patient already has a portal account.")
+            messages.error(self.request, _("This patient already has a portal account."))
             return redirect(self.patient)
         form.save()
-        messages.success(self.request, "Portal account created.")
+        messages.success(self.request, _("Portal account created."))
         return redirect(self.patient)

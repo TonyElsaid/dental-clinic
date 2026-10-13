@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}{{ page_title }} - {{ CLINIC_NAME }}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
@@ -6,11 +7,11 @@
     <div class="card border-danger shadow-sm">
       <div class="card-header bg-danger text-white"><h1 class="h5 mb-0">{{ page_title }}</h1></div>
       <div class="card-body">
-        <p>Are you sure you want to delete <strong>{{ object }}</strong>? This cannot be undone.</p>
+        <p>{% blocktrans with object=object %}Are you sure you want to delete <strong>{{ object }}</strong>? This cannot be undone.{% endblocktrans %}</p>
         <form method="post">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Yes, delete</button>
-          <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-danger">{% trans "Yes, delete" %}</button>
+          <a href="{{ cancel_url }}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
         </form>
       </div>
     </div>

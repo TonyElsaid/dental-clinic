@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 
 class AppointmentQuerySet(models.QuerySet):
@@ -21,10 +22,10 @@ class AppointmentQuerySet(models.QuerySet):
 
 class Appointment(models.Model):
     class Status(models.TextChoices):
-        SCHEDULED = "scheduled", "Scheduled"
-        COMPLETED = "completed", "Completed"
-        CANCELLED = "cancelled", "Cancelled"
-        NO_SHOW = "no_show", "No-show"
+        SCHEDULED = "scheduled", _("Scheduled")
+        COMPLETED = "completed", _("Completed")
+        CANCELLED = "cancelled", _("Cancelled")
+        NO_SHOW = "no_show", _("No-show")
 
     # Only these statuses occupy the dentist's / patient's time slot.
     BLOCKING_STATUSES = (Status.SCHEDULED, Status.COMPLETED)
@@ -78,7 +79,7 @@ class Appointment(models.Model):
         start = datetime.combine(self.date, self.start_time)
         end = start + timedelta(minutes=self.service.duration_minutes)
         if end.date() != self.date:
-            raise ValidationError({"start_time": "The appointment must finish before midnight."})
+            raise ValidationError({"start_time": _("The appointment must finish before midnight.")})
         return end.time()
 
     def check_conflicts(self):
@@ -100,17 +101,17 @@ class Appointment(models.Model):
         )
         if self.dentist_id and overlapping.filter(dentist_id=self.dentist_id).exists():
             raise ValidationError(
-                {"start_time": "This dentist is already booked during that time slot."}
+                {"start_time": _("This dentist is already booked during that time slot.")}
             )
         if self.patient_id and overlapping.filter(patient_id=self.patient_id).exists():
             raise ValidationError(
-                {"start_time": "This patient already has an appointment during that time slot."}
+                {"start_time": _("This patient already has an appointment during that time slot.")}
             )
 
     def clean(self):
         super().clean()
         if self.dentist_id and self.dentist.role != "dentist":
-            raise ValidationError({"dentist": "The selected user is not a dentist."})
+            raise ValidationError({"dentist": _("The selected user is not a dentist.")})
         if not (self.service_id and self.date and self.start_time):
             return  # field-level errors are reported elsewhere
         self.end_time = self.compute_end_time()

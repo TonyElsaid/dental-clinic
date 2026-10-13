@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Service(models.Model):
@@ -11,9 +12,9 @@ class Service(models.Model):
     duration_minutes = models.PositiveIntegerField(
         default=30,
         validators=[MinValueValidator(5)],
-        help_text="Estimated duration in minutes (used to block the dentist's time).",
+        help_text=_("Estimated duration in minutes (used to block the dentist's time)."),
     )
-    is_active = models.BooleanField(default=True, help_text="Inactive services cannot be booked.")
+    is_active = models.BooleanField(default=True, help_text=_("Inactive services cannot be booked."))
 
     class Meta:
         ordering = ["name"]

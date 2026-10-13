@@ -1,4 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.translation import gettext_lazy as _
 
 from .mixins import BootstrapFormMixin
 from .models import User
@@ -10,6 +11,13 @@ class StaffCreateForm(BootstrapFormMixin, UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("username", "first_name", "last_name", "email", "phone", "role")
+        labels = {
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
+            "email": _("Email"),
+            "phone": _("Phone"),
+            "role": _("Role"),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,13 +1,14 @@
+{% load i18n %}
 {% if is_paginated %}
-<nav aria-label="Pagination">
+<nav aria-label="{% trans 'Pagination' %}">
   <ul class="pagination justify-content-center mt-3">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a></li>
-    {% else %}<li class="page-item disabled"><span class="page-link">Previous</span></li>{% endif %}
-    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+      <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+    {% else %}<li class="page-item disabled"><span class="page-link">{% trans "Previous" %}</span></li>{% endif %}
+    <li class="page-item disabled"><span class="page-link">{% blocktrans with number=page_obj.number pages=paginator.num_pages %}Page {{ number }} of {{ pages }}{% endblocktrans %}</span></li>
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a></li>
-    {% else %}<li class="page-item disabled"><span class="page-link">Next</span></li>{% endif %}
+      <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">{% trans "Next" %}</a></li>
+    {% else %}<li class="page-item disabled"><span class="page-link">{% trans "Next" %}</span></li>{% endif %}
   </ul>
 </nav>
 {% endif %}

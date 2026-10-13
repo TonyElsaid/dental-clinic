@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import password_validation
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from accounts.mixins import BootstrapFormMixin
 from accounts.models import User
@@ -16,6 +17,19 @@ class PatientForm(BootstrapFormMixin, forms.ModelForm):
             "emergency_contact_name", "emergency_contact_phone",
             "address", "medical_history", "allergies",
         ]
+        labels = {
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
+            "date_of_birth": _("Date of birth"),
+            "gender": _("Gender"),
+            "phone": _("Phone"),
+            "email": _("Email"),
+            "emergency_contact_name": _("Emergency contact name"),
+            "emergency_contact_phone": _("Emergency contact phone"),
+            "address": _("Address"),
+            "medical_history": _("Medical history"),
+            "allergies": _("Allergies"),
+        }
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "address": forms.Textarea(attrs={"rows": 2}),
@@ -26,7 +40,7 @@ class PatientForm(BootstrapFormMixin, forms.ModelForm):
     def clean_date_of_birth(self):
         dob = self.cleaned_data["date_of_birth"]
         if dob > timezone.localdate():
-            raise forms.ValidationError("Date of birth cannot be in the future.")
+            raise forms.ValidationError(_("Date of birth cannot be in the future."))
         return dob
 
 
@@ -34,8 +48,8 @@ class PortalAccountForm(BootstrapFormMixin, forms.Form):
     """Create a patient-portal login for an existing patient record."""
 
     username = forms.CharField(max_length=150)
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
+    password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_("Confirm password"), widget=forms.PasswordInput)
 
     def __init__(self, *args, patient=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,7 +58,7 @@ class PortalAccountForm(BootstrapFormMixin, forms.Form):
     def clean_username(self):
         username = self.cleaned_data["username"]
         if User.objects.filter(username__iexact=username).exists():
-            raise forms.ValidationError("That username is already taken.")
+            raise forms.ValidationError(_("That username is already taken."))
         return username
 
     def clean(self):
@@ -52,7 +66,7 @@ class PortalAccountForm(BootstrapFormMixin, forms.Form):
         p1, p2 = cleaned.get("password1"), cleaned.get("password2")
         if p1 and p2:
             if p1 != p2:
-                self.add_error("password2", "The two passwords do not match.")
+                self.add_error("password2", _("The two passwords do not match."))
             else:
                 try:
                     password_validation.validate_password(p1)

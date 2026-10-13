@@ -5,13 +5,14 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class Invoice(models.Model):
     class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        PARTIAL = "partial", "Partial"
-        PAID = "paid", "Paid"
+        PENDING = "pending", _("Pending")
+        PARTIAL = "partial", _("Partial")
+        PAID = "paid", _("Paid")
 
     appointment = models.OneToOneField(
         "appointments.Appointment", on_delete=models.PROTECT, related_name="invoice"
@@ -66,10 +67,10 @@ class Invoice(models.Model):
 
 class Payment(models.Model):
     class Method(models.TextChoices):
-        CASH = "cash", "Cash"
-        CARD = "card", "Card"
-        TRANSFER = "transfer", "Bank transfer"
-        INSURANCE = "insurance", "Insurance"
+        CASH = "cash", _("Cash")
+        CARD = "card", _("Card")
+        TRANSFER = "transfer", _("Bank transfer")
+        INSURANCE = "insurance", _("Insurance")
 
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])

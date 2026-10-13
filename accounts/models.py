@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from . import roles
 
@@ -8,10 +9,10 @@ class User(AbstractUser):
     """Custom user with a clinic role."""
 
     class Role(models.TextChoices):
-        ADMIN = roles.ADMIN, "Admin (Clinic Manager)"
-        DENTIST = roles.DENTIST, "Dentist"
-        RECEPTIONIST = roles.RECEPTIONIST, "Receptionist"
-        PATIENT = roles.PATIENT, "Patient"
+        ADMIN = roles.ADMIN, _("Admin (Clinic Manager)")
+        DENTIST = roles.DENTIST, _("Dentist")
+        RECEPTIONIST = roles.RECEPTIONIST, _("Receptionist")
+        PATIENT = roles.PATIENT, _("Patient")
 
     # Least privilege by default: an account without an explicit role is a patient.
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PATIENT)

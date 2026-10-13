@@ -1,33 +1,33 @@
 {% extends "base.html" %}
-{% load clinic_tags %}
+{% load clinic_tags i18n %}
 {% block title %}{{ invoice.invoice_number }} - {{ CLINIC_NAME }}{% endblock %}
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
   <h1 class="h3 mb-0">{{ invoice.invoice_number }} <span class="badge bg-{{ invoice.status|badge_class }}">{{ invoice.get_status_display }}</span></h1>
   <div class="d-flex gap-2">
-    <a href="{% url 'billing:pdf' invoice.pk %}" target="_blank" class="btn btn-outline-secondary">Download PDF</a>
-    {% if invoice.status != 'paid' %}<a href="{% url 'billing:payment' invoice.pk %}" class="btn btn-success">Record payment</a>{% endif %}
+    <a href="{% url 'billing:pdf' invoice.pk %}" target="_blank" class="btn btn-outline-secondary">{% trans "Download PDF" %}</a>
+    {% if invoice.status != 'paid' %}<a href="{% url 'billing:payment' invoice.pk %}" class="btn btn-success">{% trans "Record payment" %}</a>{% endif %}
   </div>
 </div>
 <div class="row g-3">
   <div class="col-lg-6"><div class="card shadow-sm"><ul class="list-group list-group-flush">
-    <li class="list-group-item"><strong>Patient:</strong> <a href="{{ invoice.patient.get_absolute_url }}">{{ invoice.patient }}</a></li>
-    <li class="list-group-item"><strong>Service:</strong> {{ invoice.appointment.service }}</li>
-    <li class="list-group-item"><strong>Appointment:</strong> <a href="{{ invoice.appointment.get_absolute_url }}">{{ invoice.appointment.date }}</a> with {{ invoice.appointment.dentist }}</li>
-    <li class="list-group-item"><strong>Issued:</strong> {{ invoice.issue_date }}</li>
+    <li class="list-group-item"><strong>{% trans "Patient" %}:</strong> <a href="{{ invoice.patient.get_absolute_url }}">{{ invoice.patient }}</a></li>
+    <li class="list-group-item"><strong>{% trans "Service" %}:</strong> {{ invoice.appointment.service }}</li>
+    <li class="list-group-item"><strong>{% trans "Appointment" %}:</strong> <a href="{{ invoice.appointment.get_absolute_url }}">{{ invoice.appointment.date }}</a> {% trans "with" %} {{ invoice.appointment.dentist }}</li>
+    <li class="list-group-item"><strong>{% trans "Issued" %}:</strong> {{ invoice.issue_date }}</li>
   </ul></div></div>
   <div class="col-lg-6"><div class="card shadow-sm"><ul class="list-group list-group-flush">
-    <li class="list-group-item d-flex justify-content-between"><span>Total</span><strong>${{ invoice.amount }}</strong></li>
-    <li class="list-group-item d-flex justify-content-between"><span>Paid</span><strong>${{ invoice.amount_paid }}</strong></li>
-    <li class="list-group-item d-flex justify-content-between"><span>Balance</span><strong>${{ invoice.balance }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>{% trans "Total" %}</span><strong>${{ invoice.amount }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>{% trans "Paid" %}</span><strong>${{ invoice.amount_paid }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>{% trans "Balance" %}</span><strong>${{ invoice.balance }}</strong></li>
   </ul></div></div>
 </div>
-<h2 class="h5 mt-4">Payments</h2>
+<h2 class="h5 mt-4">{% trans "Payments" %}</h2>
 <div class="card shadow-sm"><div class="table-responsive"><table class="table mb-0">
-  <thead><tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount</th></tr></thead>
+  <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Method" %}</th><th>{% trans "Reference" %}</th><th class="text-end">{% trans "Amount" %}</th></tr></thead>
   <tbody>
   {% for p in invoice.payments.all %}
     <tr><td>{{ p.paid_at|date:"d M Y H:i" }}</td><td>{{ p.get_method_display }}</td><td>{{ p.reference|default:"-" }}</td><td class="text-end">${{ p.amount }}</td></tr>
-  {% empty %}<tr><td colspan="4" class="text-center text-muted py-3">No payments recorded.</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="4" class="text-center text-muted py-3">{% trans "No payments recorded." %}</td></tr>{% endfor %}
   </tbody></table></div></div>
 {% endblock %}

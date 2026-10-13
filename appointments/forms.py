@@ -1,6 +1,7 @@
 from django import forms
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from accounts import roles
 from accounts.mixins import BootstrapFormMixin
@@ -15,6 +16,15 @@ class AppointmentForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Appointment
         fields = ["patient", "dentist", "service", "date", "start_time", "status", "notes"]
+        labels = {
+            "patient": _("Patient"),
+            "dentist": _("Dentist"),
+            "service": _("Service"),
+            "date": _("Date"),
+            "start_time": _("Start time"),
+            "status": _("Status"),
+            "notes": _("Notes"),
+        }
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "start_time": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
@@ -33,5 +43,5 @@ class AppointmentForm(BootstrapFormMixin, forms.ModelForm):
     def clean_date(self):
         date = self.cleaned_data["date"]
         if not self.instance.pk and date < timezone.localdate():
-            raise forms.ValidationError("New appointments cannot be booked in the past.")
+            raise forms.ValidationError(_("New appointments cannot be booked in the past."))
         return date
