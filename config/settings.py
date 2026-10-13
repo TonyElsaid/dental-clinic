@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "billing",
     "dashboard",
     "portal",
+    "api",
 ]
 
 MIDDLEWARE = [
