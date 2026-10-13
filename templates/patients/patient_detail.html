@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load clinic_tags %}
+{% block title %}{{ patient.full_name }} - {{ CLINIC_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0">{{ patient.full_name }}</h1>
+  <div class="d-flex gap-2">
+    {% if user.is_front_desk %}
+      <a href="{% url 'appointments:create' %}?patient={{ patient.pk }}" class="btn btn-success">Book appointment</a>
+      <a href="{% url 'patients:update' patient.pk %}" class="btn btn-outline-primary">Edit</a>
+      {% if not patient.user_id %}<a href="{% url 'patients:portal_account' patient.pk %}" class="btn btn-outline-secondary">Create portal account</a>{% endif %}
+    {% endif %}
+    {% if user.is_clinic_admin %}<a href="{% url 'patients:delete' patient.pk %}" class="btn btn-outline-danger">Delete</a>{% endif %}
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100"><div class="card-header">Details</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Date of birth:</strong> {{ patient.date_of_birth }} ({{ patient.age }} yrs)</li>
+        <li class="list-group-item"><strong>Gender:</strong> {{ patient.get_gender_display }}</li>
+        <li class="list-group-item"><strong>Phone:</strong> {{ patient.phone }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ patient.email|default:"-" }}</li>
+        <li class="list-group-item"><strong>Address:</strong> {{ patient.address|default:"-" }}</li>
+        <li class="list-group-item"><strong>Emergency contact:</strong> {{ patient.emergency_contact_name|default:"-" }} {{ patient.emergency_contact_phone }}</li>
+        <li class="list-group-item"><strong>Portal account:</strong> {% if patient.user %}{{ patient.user.username }}{% else %}none{% endif %}</li>
+      </ul></div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm mb-3 {% if patient.allergies %}border-danger{% endif %}"><div class="card-header">Allergies</div>
+      <div class="card-body">{{ patient.allergies|default:"None recorded"|linebreaksbr }}</div></div>
+    <div class="card shadow-sm"><div class="card-header">Medical history</div>
+      <div class="card-body">{{ patient.medical_history|default:"None recorded"|linebreaksbr }}</div></div>
+  </div>
+</div>
+<h2 class="h5 mt-4">Appointment history</h2>
+<div class="card shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Date</th><th>Time</th><th>Service</th><th>Dentist</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for a in appointments %}
+    <tr><td>{{ a.date }}</td><td>{{ a.start_time|time:"H:i" }}</td><td>{{ a.service }}</td><td>{{ a.dentist }}</td>
+      <td><span class="badge bg-{{ a.status|badge_class }}">{{ a.get_status_display }}</span></td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'appointments:detail' a.pk %}">View</a></td></tr>
+  {% empty %}
+    <tr><td colspan="6" class="text-center text-muted py-4">No appointments yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

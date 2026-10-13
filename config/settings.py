@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",
     "services",
+    "patients",
 ]
 
 MIDDLEWARE = [
