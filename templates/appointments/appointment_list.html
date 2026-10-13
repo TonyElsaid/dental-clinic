@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load clinic_tags %}
+{% block title %}Appointments - {{ CLINIC_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Appointments</h1>
+  {% if user.is_front_desk %}<a href="{% url 'appointments:create' %}?date={{ anchor|date:'Y-m-d' }}" class="btn btn-primary">Book appointment</a>{% endif %}
+</div>
+
+<div class="card card-body shadow-sm mb-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div class="btn-group" role="group" aria-label="View">
+      <a class="btn btn-outline-primary {% if mode == 'day' %}active{% endif %}" href="?view=day&date={{ anchor|date:'Y-m-d' }}&{{ filter_query }}">Day</a>
+      <a class="btn btn-outline-primary {% if mode == 'week' %}active{% endif %}" href="?view=week&date={{ anchor|date:'Y-m-d' }}&{{ filter_query }}">Week</a>
+      <a class="btn btn-outline-primary {% if mode == 'month' %}active{% endif %}" href="?view=month&date={{ anchor|date:'Y-m-d' }}&{{ filter_query }}">Month</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a class="btn btn-outline-secondary" href="?view={{ mode }}&date={{ prev_date|date:'Y-m-d' }}&{{ filter_query }}">&laquo; Prev</a>
+      <a class="btn btn-outline-secondary" href="?view={{ mode }}&date={{ today|date:'Y-m-d' }}&{{ filter_query }}">Today</a>
+      <a class="btn btn-outline-secondary" href="?view={{ mode }}&date={{ next_date|date:'Y-m-d' }}&{{ filter_query }}">Next &raquo;</a>
+    </div>
+    <strong>{% if mode == 'day' %}{{ range_start|date:"l, d M Y" }}{% elif mode == 'week' %}{{ range_start|date:"d M" }} &ndash; {{ range_end|date:"d M Y" }}{% else %}{{ range_start|date:"F Y" }}{% endif %}</strong>
+  </div>
+  <form method="get" class="row g-2">
+    <input type="hidden" name="view" value="{{ mode }}"><input type="hidden" name="date" value="{{ anchor|date:'Y-m-d' }}">
+    <div class="col-md-4"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Patient name"></div>
+    <div class="col-md-3"><select name="status" class="form-select"><option value="">Any status</option>
+      {% for value, label in status_choices %}<option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    {% if not user.is_dentist %}
+    <div class="col-md-3"><select name="dentist" class="form-select"><option value="">All dentists</option>
+      {% for d in dentists %}<option value="{{ d.pk }}" {% if d.pk|stringformat:"s" == selected_dentist %}selected{% endif %}>{{ d }}</option>{% endfor %}</select></div>
+    {% endif %}
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Filter</button></div>
+  </form>
+</div>
+
+{% regroup appointments by date as days %}
+{% for day in days %}
+  <h2 class="h6 text-uppercase text-muted mt-3">{{ day.grouper|date:"l, d M Y" }}</h2>
+  <div class="card shadow-sm mb-2"><div class="table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Time</th><th>Patient</th><th>Service</th><th>Dentist</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for a in day.list %}
+      <tr>
+        <td>{{ a.start_time|time:"H:i" }} &ndash; {{ a.end_time|time:"H:i" }}</td>
+        <td><a href="{{ a.patient.get_absolute_url }}" class="text-decoration-none">{{ a.patient }}</a></td>
+        <td>{{ a.service }}</td><td>{{ a.dentist }}</td>
+        <td><span class="badge bg-{{ a.status|badge_class }}">{{ a.get_status_display }}</span></td>
+        <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ a.get_absolute_url }}">Open</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div></div>
+{% empty %}
+  <div class="card card-body text-center text-muted">No appointments in this period.</div>
+{% endfor %}
+{% endblock %}
