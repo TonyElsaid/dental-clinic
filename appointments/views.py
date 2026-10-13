@@ -2,6 +2,7 @@ import calendar
 from datetime import date, timedelta
 
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
@@ -182,19 +183,14 @@ class AppointmentStatusView(RoleRequiredMixin, View):
 
 
 class AppointmentDeleteView(
-    RoleRequiredMixin, PageContextMixin, SafeDeleteMixin, DeleteView
+    RoleRequiredMixin, PageContextMixin, SafeDeleteMixin, SuccessMessageMixin, DeleteView
 ):
     allowed_roles = (roles.ADMIN,)
     model = Appointment
     template_name = "confirm_delete.html"
     success_url = reverse_lazy("appointments:list")
+    success_message = "Appointment deleted."
     page_title = "Delete appointment"
 
     def get_cancel_url(self):
         return self.object.get_absolute_url()
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if response.status_code == 302 and response.url == str(self.success_url):
-            messages.success(self.request, "Appointment deleted.")
-        return response
